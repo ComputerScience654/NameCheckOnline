@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}เช็คชื่อ{% endblock %}
+
+{% block content %}
+<h2>เช็คชื่อ</h2>
+<form id="attendanceForm" enctype="multipart/form-data"> 
+    <input type="text" id="fullName" name="fullName" placeholder="ชื่อ-นามสกุล" required>
+    <input type="text" id="studentID" name="studentID" placeholder="เลขประจำตัวนักเรียน" required>
+    <input type="file" id="imageUpload" name="image" accept="image/*" required>
+    <button type="submit">ตกลง</button>
+    <a href="{{ url_for('history_page') }}">
+        <button type="button">ดูประวัติ</button>
+    </a>
+</form>
+
+<script>
+document.getElementById('attendanceForm').addEventListener('submit', function(event) {
+    event.preventDefault();
+    var formData = new FormData(this);
+
+    saveData(formData)
+ });
+ async function saveData(formData) {
+    let token = localStorage.getItem("token");
+    try {
+        let response = await fetch("http://127.0.0.1:5000/attendance", {
+            method: "POST",
+            headers: {
+                "Authorization": `Bearer ${token}`
+            },
+            body: formData
+        });
+
+        let text = await response.text();  // อ่าน response เป็น text ก่อน
+        console.log("Raw Response:", text);  // ดูว่าได้อะไรกลับมา
+
+        let data = JSON.parse(text); // แปลง JSON
+        if (response.ok) {
+            alert("บันทึกข้อมูลเรียบร้อย!");
+            window.location.href = "/history";
+        } else {
+            alert("เกิดข้อผิดพลาด: " + data.message);
+        }
+    } catch (error) {
+        console.error("Error:", error);
+        alert("เกิดข้อผิดพลาดในการเชื่อมต่อ");
+    }
+}
+</script>
+{% endblock %}

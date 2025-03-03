@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block title %}ลืมรหัสผ่าน{% endblock %}
+
+{% block content %}
+<h2>ลืมรหัสผ่าน</h2>
+<input type="email" id="forgotEmail" placeholder="Email">
+<input type="password" id="newPass" placeholder="New Password">
+<button onclick="resetPassword()">ตั้งรหัสใหม่</button>
+<a href="{{ url_for('login') }}">กลับไปเข้าสู่ระบบ</a>
+{% endblock %}

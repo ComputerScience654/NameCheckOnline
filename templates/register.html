@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block title %}ลงทะเบียน{% endblock %}
+
+{% block content %}
+<h2>ลงทะเบียน</h2>
+<form id="registerForm">
+    <input type="email" id="regEmail" placeholder="Email" required>
+    <input type="text" id="regUser" placeholder="Username" required>
+    <input type="password" id="regPass" placeholder="Password" required>
+    <input type="password" id="confirmPass" placeholder="Confirm Password" required>
+    <button type="submit">ลงทะเบียน</button>
+</form>
+<a href="{{ url_for('login_page') }}">กลับไปเข้าสู่ระบบ</a>
+
+<!-- นำเข้าไฟล์ script.js -->
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+{% endblock %}

@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block title %}ประวัติการเช็คชื่อ{% endblock %}
+
+{% block content %}
+<h2>ประวัติการเช็คชื่อ</h2>
+<table border="1">
+    <thead>
+        <tr>
+            <th>เวลา</th>
+            <th>ชื่อ-นามสกุล</th>
+            <th>เลขประจำตัว</th>
+            <th>รูปภาพ</th>
+        </tr>
+    </thead>
+    <tbody id="historyTable"></tbody>
+</table>
+<a href="{{ url_for('attendance_page') }}">
+    <button>กลับ</button>
+</a>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    fetch('/history-data', {
+        headers: {
+            'Authorization': 'Bearer ' + localStorage.getItem('token') // ส่ง Token
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        const historyTable = document.getElementById('historyTable');
+        historyTable.innerHTML = '';  
+
+        data.forEach(record => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${record.timestamp}</td>
+                <td>${record.name}</td>
+                <td>${record.student_id}</td>
+                <td><img src="${record.image_url}" alt="Student Image" width="100"></td>
+            `;
+            historyTable.appendChild(row);
+        });
+    })
+    .catch(error => console.error('Error:', error));
+});
+</script>
+{% endblock %}
