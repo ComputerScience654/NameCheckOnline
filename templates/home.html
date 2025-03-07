@@ -15,37 +15,34 @@
 </form>
 
 <script>
-document.getElementById('attendanceForm').addEventListener('submit', function(event) {
-    event.preventDefault();
-    var formData = new FormData(this);
-
-    saveData(formData)
- });
- async function saveData(formData) {
-    let token = localStorage.getItem("token");
-    try {
-        let response = await fetch("http://127.0.0.1:5000/attendance", {
-            method: "POST",
-            headers: {
-                "Authorization": `Bearer ${token}`
-            },
-            body: formData
-        });
-
-        let text = await response.text();  // อ่าน response เป็น text ก่อน
-        console.log("Raw Response:", text);  // ดูว่าได้อะไรกลับมา
-
-        let data = JSON.parse(text); // แปลง JSON
-        if (response.ok) {
-            alert("บันทึกข้อมูลเรียบร้อย!");
-            window.location.href = "/history";
-        } else {
-            alert("เกิดข้อผิดพลาด: " + data.message);
+    document.getElementById('attendanceForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+        var formData = new FormData(this);
+    
+        saveData(formData)
+     });
+     async function saveData(formData) {
+        let token = localStorage.getItem("token");
+        try {
+            let response = await fetch("http://127.0.0.1:5000/attendance", {
+                method: "POST",
+                headers: {
+                    "Authorization": `Bearer ${token}`
+                },
+                body: formData
+            });
+    
+            let data = await response.json();
+            if (response.ok) {
+                alert("📢 บันทึกข้อมูลสำเร็จ และส่งข้อมูลไปยัง LINE!");
+                window.location.href = "/history";
+            } else {
+                alert("เกิดข้อผิดพลาด: " + data.message);
+            }
+        } catch (error) {
+            console.error("Error:", error);
+            alert("เกิดข้อผิดพลาดในการเชื่อมต่อ");
         }
-    } catch (error) {
-        console.error("Error:", error);
-        alert("เกิดข้อผิดพลาดในการเชื่อมต่อ");
     }
-}
-</script>
+ </script>
 {% endblock %}
