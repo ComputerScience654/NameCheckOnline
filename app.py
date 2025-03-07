@@ -32,6 +32,33 @@ def send_line_message(text):
     except Exception as e:
         print("⚠️ Error sending LINE message:", e)
 
+def send_line_image(image_url):
+    """ ส่งรูปภาพไปยัง LINE Messaging API """
+    url = "https://api.line.me/v2/bot/message/push"
+    headers = {
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {LINE_CHANNEL_ACCESS_TOKEN}"
+    }
+    data = {
+        "to": LINE_USER_ID,
+        "messages": [
+            {
+                "type": "image",
+                "originalContentUrl": image_url,
+                "previewImageUrl": image_url
+            }
+        ]
+    }
+
+    try:
+        response = requests.post(url, headers=headers, json=data)
+        if response.status_code == 200:
+            print("📢 ส่งรูปไปยัง LINE สำเร็จ!")
+        else:
+            print("❌ ไม่สามารถส่งรูปไปยัง LINE ได้:", response.text)
+    except Exception as e:
+        print("⚠️ Error sending LINE image:", e)
+
 
 app = Flask(__name__)
 CORS(app)
@@ -146,9 +173,14 @@ def mark_attendance():
         db.session.add(new_attendance)
         db.session.commit()
 
-        # ✨ ส่งข้อความแจ้งเตือนไปยัง LINE
+        # สร้าง URL ของรูปภาพ
+        NGROK_URL = "https://e9e1-49-230-139-44.ngrok-free.app"  # ใส่ URL จาก ngrok
+        image_url = f"{NGROK_URL}/static/uploads/{filename}"
+
+        # ✨ ส่งข้อความแจ้งเตือนพร้อมรูปภาพไปยัง LINE
         line_message = f"📌 เช็คชื่อสำเร็จ!\n👤 ชื่อ: {student_name}\n🆔 รหัสนักเรียน: {student_id}\n⏰ เวลา: {timestamp.strftime('%Y-%m-%d %H:%M:%S')}"
-        send_line_message(line_message)
+        send_line_message(line_message)  # ส่งข้อความ
+        send_line_image(image_url)  # ส่งรูปภาพ
 
         return jsonify({'message': 'Attendance recorded successfully'}), 201
 
@@ -165,7 +197,7 @@ def get_history():
         'name': rec.student_name,
         'student_id': rec.student_id,
         'timestamp': rec.timestamp.strftime('%Y-%m-%d %H:%M:%S'),
-        'image_url': url_for('static', filename=rec.image_path.split('/')[-1], _external=True) if rec.image_path else None
+        'image_url': url_for('static', filename=f"uploads/{os.path.basename(rec.image_path)}", _external=True) if rec.image_path else None
     } for rec in records]
     
     return jsonify(history)
